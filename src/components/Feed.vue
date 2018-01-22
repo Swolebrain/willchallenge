@@ -1,27 +1,29 @@
 <template>
   <div class="main-page">
-    <div class="top-bar">
-      <div class="top-bar__badge">
-        <h1>Start a Challenge</h1>
-      </div>
-      <div class="top-bar__badge">
-        <h1>Join a Challenge</h1>
-      </div>
-    </div>
+    <slot name="top-bar"></slot>
     <div class="feed">
-        <div class="challenge" v-for="(challenge, index) in challenges">
-          <div class="challenge__description">
-            {{ challenge.description || "Challenge Description Missing" }}
-          </div>
-          <div class="challenge__bottom-line">
-            <div class="challenge__owner">
-              By: {{challenge.owner}}
-            </div>
-            <div class="challenge__subscribers">
-              Subscribers: {{ challenge.subscribers.length }}
-            </div>
+      <div class="loader" v-if="!challenges">
+        <RingLoader  />
+      </div>
+      <div class="loader" v-if="challenges && challenges.length === 0">
+        <h4>- no results -</h4>
+      </div>
+      <div class="challenge" v-for="(challenge, index) in challenges" :key="challenge._id">
+        <h2 class="challenge__description">
+          {{ challenge.description || "Challenge Description Missing" }}
+        </h2>
+        <div class="challenge__bottom-line">
+          <h3 class="challenge__owner">
+            By: 
+            <img :src="challenge.ownerPicture"/>
+            {{challenge.ownerName}}
+          </h3>
+          <div class="challenge__subscribers">
+            <div @click="subscribeTo(challenge._id)">+ Join</div>
+            <div>Subscribers: {{ challenge.subscribers.length }} </div>
           </div>
         </div>
+      </div>
     </div>
   </div>
 
@@ -29,31 +31,33 @@
 
 <script>
   import challengeClient from '../network/ChallengeClient';
+  import RingLoader from 'vue-spinner/src/RingLoader.vue';
 
   export default {
     name: 'feed',
-    props: ['auth'],
-    data () {
-      return {
-        challenges: []
-      }
-    },
-    created () {
-      this.loadFeed();
+    props: ['auth', 'challenges'],
+    components: {
+      RingLoader: RingLoader
     },
     methods: {
-      async loadFeed () {
-        console.log('loading feed...');
-        const challenges = await challengeClient.loadAllChallenges(this.auth)
-        this.challenges = challenges;
+      subscribeTo (id) {
+        this.$emit('subscribeToChallenge', id);
       }
+    },
+    async created () {
+      const challenges = await challengeClient.loadAllChallenges(this.auth);
+      console.log('challenges loaded from api', challenges);
+      this.$emit('loadChallenges', challenges);
     }
   }
 </script>
 
 <style>
-  .main-page{
-
+  .loader{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
   }
   .top-bar{
     display: flex;
@@ -73,5 +77,8 @@
   .challenge__subscribers {
     text-align: right;
     flex:1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
   }
 </style>

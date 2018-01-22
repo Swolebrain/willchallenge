@@ -3,7 +3,7 @@
     <nav class="navbar navbar-default">
       <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Auth0 - Vue</a>
+          <a class="navbar-brand">WynnIt</a>
 
           <router-link :to="'/'"
             class="btn btn-primary btn-margin">
@@ -23,12 +23,6 @@
             @click="logout()">
               Log Out
           </button>
-
-          <router-link :to="'/create-challenge'"
-            class="btn btn-primary btn-margin"
-            v-if="authenticated" >
-              Create Challenge
-          </router-link>
 
         </div>
       </div>

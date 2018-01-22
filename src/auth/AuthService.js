@@ -53,7 +53,8 @@ export default class AuthService {
     console.log(authResult);
     localStorage.setItem('access_token', authResult.accessToken)
     this.accessToken = authResult.accessToken;
-    localStorage.setItem('id_token', authResult.idToken)
+    localStorage.setItem('id_token', authResult.idToken);
+    this.idtoken = authResult.idToken;
     localStorage.setItem('expires_at', expiresAt)
     this.authNotifier.emit('authChange', { authenticated: true })
     this.userProfile = this.profileAdapter(authResult.idTokenPayload)
@@ -102,5 +103,9 @@ export default class AuthService {
 
   getAccessToken () {
     return this.accessToken || localStorage.getItem('access_token');
+  }
+
+  getIdToken () {
+    return this.idtoken || localStorage.getItem('id_token');
   }
 }
